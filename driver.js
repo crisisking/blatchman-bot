@@ -34,9 +34,7 @@ conn.on('ready', function() {
                    actual_contents.push(contents[i]);
                } 
            }
-           
-           console.log(actual_contents);
-           
+                      
            for(var i=0; i<actual_contents.length - 1; i += 1) {
                var word = actual_contents[i];
                if(word) {
