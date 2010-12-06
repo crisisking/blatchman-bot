@@ -81,7 +81,6 @@ conn.on('PRIVMSG', function(message) {
 
 process.on('SIGINT', on_exit);
 process.on('SIGTERM', on_exit);
-process.on('exit', on_exit);
 
 process.on('uncaughtException', function(err) {
     console.log(err);
