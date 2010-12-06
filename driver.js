@@ -69,7 +69,10 @@ conn.on('PRIVMSG', function(message) {
             save_db();
         } else if(message.args[0] === ':!join') {
             conn.join(message.args[1]);
-        } 
+        } else if(message.args[0] === ':!quit') {
+            conn.write('QUIT :' + message.args[1] || "fart lol");
+            on_exit();
+        }
     }
 
     message.args.unshift(target);
