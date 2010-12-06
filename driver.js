@@ -64,7 +64,6 @@ conn.on('PRIVMSG', function(message) {
         if(message.args[0] === ':!dump') {
             for(i in db) {
                 console.log(i + ': ' + db[i]);
-                conn.message('Xenos', i + ': ' + JSON.stringify(db[i]));
             }
         } else if(message.args[0] === ':!save') {
             save_db();
