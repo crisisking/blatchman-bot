@@ -52,7 +52,6 @@ conn.on('PRIVMSG', function(message) {
     }
 
     message.args.unshift(target);
-    fs.writeFileSync(filename, JSON.stringify(db), 'utf8');
 
 });
 
@@ -68,7 +67,7 @@ conn.on('PRIVMSG', function(message) {
                 conn.message('Xenos', i + ': ' + JSON.stringify(db[i]));
             }
         } else if(message.args[0] === ':!save') {
-            fs.writeFileSync(filename, JSON.stringify(db), 'utf8');
+            save_db();
         } else if(message.args[0] === ':!join') {
             conn.join(message.args[1]);
         } 
@@ -78,8 +77,25 @@ conn.on('PRIVMSG', function(message) {
 
 });
 
-process.on('SIGINT', function() {
+process.on('SIGINT', on_exit);
+process.on('SIGTERM', on_exit);
+process.on('exit', on_exit);
+
+process.on('uncaughtException', function(err) {
+    console.log(err);
+    on_exit();
+});
+
+function save_db() {
+    console.log('Saving DB...');
     fs.writeFileSync(filename, JSON.stringify(db), 'utf8');
+    console.log('DB saved.');
+}
+
+function on_exit() {
+    save_db();
     console.log('exiting!');
     process.exit();
-});
+}
+
+setInterval(save_db, 300000);
