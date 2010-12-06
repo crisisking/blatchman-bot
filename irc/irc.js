@@ -55,8 +55,11 @@ Connection.prototype.on = function(command, callback) {
 };
 
 Connection.prototype.write_raw = function(raw_message) {
-  this.connection.emit('write_raw', raw_message);
-  this.connection.write(raw_message);
+    var conn = this.connection;
+    setTimeout(function() {
+        conn.emit('write_raw', raw_message);
+        conn.write(raw_message);
+    }, 1000);
 };
 
 Connection.prototype.write = function(message) {
