@@ -3,6 +3,7 @@ var sys = require('sys');
 var fs = require('fs');
 var filename = '/var/blatchman-logs.db';
 var reply_rate = 0.25;
+var topic_rate = 0.55;
 
 try {
     var db = JSON.parse(fs.readFileSync(filename, 'utf8'));
@@ -56,6 +57,26 @@ conn.on('PRIVMSG', function(message) {
 
 });
 
+conn.on('PRIVMSG', function(message) {
+   var target = message.args.shift();
+   if(target === '#blatchdev' || target === '#droog') {
+       var roll = Math.random();
+       if(roll <= reply_rate) {
+           roll = Math.random();
+           if(roll <= topic_rate) {
+               message.args[0] = message.args[0].substring(1);
+               var word = message.args[Math.floor(Math.random() * message.args.length)];
+               message.args[0] = ':' + message.args[0];
+               say_something(target, word);
+           } else {
+               say_something(target);
+           }
+       }
+   }
+   
+   message.args.unshift(target);
+    
+});
 
 conn.on('PRIVMSG', function(message) {
     var target = message.args.shift();
@@ -71,10 +92,11 @@ conn.on('PRIVMSG', function(message) {
         } else if(message.args[0] === ':!join') {
             conn.join(message.args[1]);
         } else if(message.args[0] === ':!quit') {
-            conn.write('QUIT :' + message.args[1] || "fart lol");
+            conn.write('QUIT :' + (message.args[1] || "fart lol"));
             setTimeout(on_exit, 1500);
         } else if(message.args[0] === ':!speak') {
             say_something('#blatchdev');
+            say_something('#droog');
         }
     }
 
@@ -86,7 +108,7 @@ process.on('SIGINT', on_exit);
 process.on('SIGTERM', on_exit);
 
 process.on('uncaughtException', function(err) {
-    console.log(err);
+    console.log(err.message);
     on_exit();
 });
 
@@ -109,15 +131,16 @@ function say_something(channel, seed_word) {
         seed_word = keys[Math.floor(Math.random() * keys.length)];
     }
     
-    do {
+    while(true) {
         sentence.push(seed_word);
         var source = db[seed_word];
         if(source) {
-            seed_word = keys[Math.floor(Math.random() * keys.length)];
+            seed_word = source[Math.floor(Math.random() * source.length)];
+        } else {
+            break;
         }
-    } while(source);
+    }
     
-    console.log('speaking!');
     conn.message(channel, sentence.join(' '));
 }
 
