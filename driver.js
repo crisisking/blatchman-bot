@@ -103,6 +103,10 @@ conn.on('PRIVMSG', function(message) {
         } else if(message.args[0] === ':!speak') {
             say_something('#blatchdev');
             say_something('#droog');
+        } else if(message.args[0] === ':!replyrate') {
+            reply_rate = Number(message.args[1]);
+        } else if(message.args[0] === ':!topicrate') {
+            topic_rate = Number(message.args[1]);
         }
     }
 
