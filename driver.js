@@ -2,6 +2,7 @@ var irc = require('./irc/irc');
 var sys = require('sys');
 var fs = require('fs');
 var filename = '/var/blatchman-logs.db';
+var reply_rate = 0.25;
 
 try {
     var db = JSON.parse(fs.readFileSync(filename, 'utf8'));
@@ -71,7 +72,9 @@ conn.on('PRIVMSG', function(message) {
             conn.join(message.args[1]);
         } else if(message.args[0] === ':!quit') {
             conn.write('QUIT :' + message.args[1] || "fart lol");
-            on_exit();
+            setTimeout(on_exit, 1500);
+        } else if(message.args[0] === ':!speak') {
+            conn
         }
     }
 
@@ -97,6 +100,26 @@ function on_exit() {
     save_db();
     console.log('exiting!');
     process.exit();
+}
+
+function say_something(channel, seed_word) {
+    var sentence = [];
+    var keys = Object.keys(db);
+    if(!seed_word) {
+        seed_word = keys[Math.floor(Math.random() * keys.length)];
+    }
+    
+    do {
+        sentence.push(seed_word);
+        var source = db[seed_word];
+        if(source) {
+            seed_word = keys[Math.floor(Math.random() * keys.length)];
+        }
+    } while(source);
+    
+    if(sentence.length > 1) {
+        conn.message(channel, sentence.join(' '));
+    }
 }
 
 setInterval(save_db, 300000);
