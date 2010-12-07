@@ -74,7 +74,7 @@ conn.on('PRIVMSG', function(message) {
             conn.write('QUIT :' + message.args[1] || "fart lol");
             setTimeout(on_exit, 1500);
         } else if(message.args[0] === ':!speak') {
-            conn
+            say_something('#blatchdev');
         }
     }
 
@@ -117,9 +117,8 @@ function say_something(channel, seed_word) {
         }
     } while(source);
     
-    if(sentence.length > 1) {
-        conn.message(channel, sentence.join(' '));
-    }
+    console.log('speaking!');
+    conn.message(channel, sentence.join(' '));
 }
 
 setInterval(save_db, 300000);
