@@ -60,10 +60,16 @@ conn.on('PRIVMSG', function(message) {
 conn.on('PRIVMSG', function(message) {
    var target = message.args.shift();
    if(target === '#blatchdev' || target === '#droog') {
-       var roll = Math.random();
+       if(message.args[0] === ':!blatch') {
+           var roll = 0;
+           var forced = true;
+       } else {
+           var roll = Math.random();
+           var forced = false;
+       }
        if(roll <= reply_rate) {
            roll = Math.random();
-           if(roll <= topic_rate) {
+           if(roll <= topic_rate && !forced) {
                message.args[0] = message.args[0].substring(1);
                var word = message.args[Math.floor(Math.random() * message.args.length)];
                message.args[0] = ':' + message.args[0];
