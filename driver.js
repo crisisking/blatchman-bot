@@ -30,7 +30,8 @@ conn.on('ready', function() {
 
 conn.on('PRIVMSG', function(message) {
     var target = message.args.shift();
-    if(target === '#blatchdev' || target === '#droog') {
+    var sender = message.prefix.substring(0, message.prefix.search('!'));
+    if(target === '#blatchdev' || target === '#droog' && sender !== 'bron') {
         var contents = message.args.join(' ').substring(1).split(' ');
         var actual_contents = [];
         for(var i=0; i<contents.length; i += 1) {
