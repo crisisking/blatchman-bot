@@ -54,6 +54,10 @@ Connection.prototype.on = function(command, callback) {
     this.connection.on(command, callback);
 };
 
+Connection.prototype.removeListener = function(command, callback) {
+    this.connection.removeListener(command, callback);
+}
+
 Connection.prototype.write_raw = function(raw_message) {
     var conn = this.connection;
     setTimeout(function() {
