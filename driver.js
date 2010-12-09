@@ -131,7 +131,7 @@ function say_something(channel, seed_word) {
         seed_word = keys[Math.floor(Math.random() * keys.length)];
     }
     
-    while(true) {
+    while(sentence.join(' ').length < 500) {
         sentence.push(seed_word);
         var source = db[seed_word];
         if(source) {
