@@ -3,15 +3,12 @@ var net = require('net');
 
 function Message(raw_message) {
     var parsed_message = raw_message.match(this.regex);
-    parsed_message[5] = parsed_message[5].trim();
-    
-    if(parsed_message[5].substring(0, 1) === ':') {
-        parsed_message[5] = parsed_message[5].substring(1);
-    }
+    parsed_message[5] = parsed_message[5].trim().split(' ');
+    parsed_message[5][1] = parsed_message[5][1].substring(1);
     
     return {"prefix": parsed_message[2], 
             "command": parsed_message[3], 
-            "args": parsed_message[5].split(' '),
+            "args": parsed_message[5],
             "raw": raw_message};
 }
 
