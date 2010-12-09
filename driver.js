@@ -1,9 +1,11 @@
-var irc = require('./irc/irc');
-var sys = require('sys');
-var fs = require('fs');
-var filename = '/var/blatchman-logs.db';
-var reply_rate = 0.25;
-var topic_rate = 0.55;
+var irc = require('./irc/irc'),
+    sys = require('sys'),
+    fs = require('fs'),
+    filename = '/var/blatchman-logs.db',
+    reply_rate = 0.25,
+    topic_rate = 0.55,
+    bot_nick = 'blatchman',
+    owner_nick = 'Xenos';
 
 try {
     var db = JSON.parse(fs.readFileSync(filename, 'utf8'));
@@ -13,7 +15,7 @@ catch(error) {
     var db = {};
 }
 
-var conn = new irc.Connection('irc.synirc.net', 6667, 'blatchman');
+var conn = new irc.Connection('irc.synirc.net', 6667, bot_nick);
 
 conn.on('raw', function(message) {
     console.log(message);
@@ -29,99 +31,77 @@ conn.on('ready', function() {
 });
 
 conn.on('PRIVMSG', function(message) {
-    var target = message.args.shift();
-    var sender = message.prefix.substring(0, message.prefix.search('!'));
-    if(target === '#blatchdev' || target === '#droog' && sender !== 'bron') {
-        var contents = message.args.join(' ').substring(1).split(' ');
-        var actual_contents = [];
-        for(var i=0; i<contents.length; i += 1) {
-            if(contents[i].trim()) {
-                actual_contents.push(contents[i]);
-            } 
-        }
-
-        if(actual_contents.length === 1) {
-            var word = actual_contents[0];
-            db[word] = db[word] || [];
-        }
-
-        for(var i=0; i<actual_contents.length - 1; i += 1) {
-            var word = actual_contents[i];
-            if(word) {
-                db[word] = db[word] || [];
-                db[word].push(actual_contents[i+1]);
-            }
-        }
-    }
-
-    message.args.unshift(target);
-
-});
-
-conn.on('PRIVMSG', function(message) {
-   var target = message.args.shift();
-   if(target === '#blatchdev' || target === '#droog') {
-       if(message.args[0] === ':!blatch') {
-           var roll = 0;
-           var forced = true;
-       } else {
-           var roll = Math.random();
-           var forced = false;
-       }
-       if(roll <= reply_rate) {
-           roll = Math.random();
-           if(roll <= topic_rate && !forced) {
-               message.args[0] = message.args[0].substring(1);
-               var word = message.args[Math.floor(Math.random() * message.args.length)];
-               message.args[0] = ':' + message.args[0];
-               say_something(target, word);
-           } else {
-               say_something(target);
-           }
-       }
-   }
-   
-   message.args.unshift(target);
+    var target = message.args.shift(),
+        actual_contents = [],
+        sender = message.prefix.substring(0, message.prefix.search('!')),
+        roll = 0,
+        word = '',
+        i = '';
+       
     
-});
-
-conn.on('PRIVMSG', function(message) {
-    var target = message.args.shift();
-    var sender = message.prefix.substring(0, message.prefix.search('!'));
-
-    if(target === 'blatchman' && sender === 'Xenos') {
+    if(target === '#blatchdev' || target === '#droog') {
+        // learning routine
+        if(sender != 'bron') {
+            setTimeout(function() {
+                learn(message.args.slice(0));
+            }, 1000);
+        }
+        
+        // speaking routine
+        if(message.args[0] === '!blatch') {
+            word = message.args[1];
+        } else {
+            roll = Math.random();
+        }
+        
+        if(roll <= reply_rate) {
+            if(!word) {
+                roll = Math.random();
+                if(roll <= topic_rate) {
+                    word = message.args[Math.floor(Math.random() * message.args.length)];
+                }
+                
+            }
+            
+            setTimeout(function() {
+                say_something(target, word);
+            }, 300);
+            
+        }
+    
+    // private command processing       
+    } else if(target === bot_nick && sender === owner_nick) {
         switch(message.args[0]) {
-            case ':!dump':
-                for(var i in db) {
+            case '!dump':
+                for(i in db) {
                     console.log(i + ': ' + db[i]);
                 }
                 break;
-            case ':!save':
+            case '!save':
                 save_db();
                 break;
-            case ':!join':
+            case '!join':
                 conn.join(message.args[1]);
                 break;
-            case ':!quit':
-                conn.write('QUIT :' + (message.args[1] || "fart lol"));
+            case '!quit':
+                conn.write('QUIT :' + (message.args.slice(1).join(' ') || "fart lol"));
                 setTimeout(on_exit, 1500);
                 break;
-            case ':!speak':
+            case '!speak':
                 say_something('#blatchdev');
                 say_something('#droog');
                 break;
-            case ':!replyrate':
+            case '!replyrate':
                 reply_rate = Number(message.args[1]);
                 break;
-            case ':!topicrate':
+            case '!topicrate':
                 topic_rate = Number(message.args[1]);
                 break;
         }
-        
     }
 
     message.args.unshift(target);
-
+  
 });
 
 process.on('SIGINT', on_exit);
@@ -162,6 +142,32 @@ function say_something(channel, seed_word) {
     }
     
     conn.message(channel, sentence.join(' '));
+}
+
+function learn(words) {
+    var i = 0,
+        word = '',
+        contents = [];
+    
+    for(i; i < words.length; i += 1) {
+        word = words[i].trim();
+        if(word) {
+            contents.push(word);
+        }
+    }
+    
+    if(contents.length === 1) {
+        word = contents[0];
+        db[word] = db[word] || [];
+        return;
+    }
+    
+    for(i=0; i < contents.length - 1; i += 1) {
+        word = contents[i];
+        db[word] = db[word] || [];
+        db[word].push(contents[i+1]);
+    }
+    
 }
 
 setInterval(save_db, 300000);
