@@ -4,7 +4,11 @@ var net = require('net');
 function Message(raw_message) {
     var parsed_message = raw_message.match(this.regex);
     parsed_message[5] = parsed_message[5].trim().split(' ');
-    parsed_message[5][1] = parsed_message[5][1].substring(1);
+    if(parsed_message[5].length > 1) {
+        parsed_message[5][1] = parsed_message[5][1].substring(1);
+    } else {
+        parsed_message[5][0] = parsed_message[5][0].substring(1);
+    }
     
     return {"prefix": parsed_message[2], 
             "command": parsed_message[3], 
