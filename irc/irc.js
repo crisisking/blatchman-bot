@@ -33,7 +33,7 @@ function Connection(server_name, port, nick) {
                 self.connection.emit('ready');
             }, 1000);
             self.connection.on('PING', function(message) {
-                self.connection.write('PONG ' + message.args[0] + '\r\n');
+                self.connection.write('PONG :' + message.args[0] + '\r\n');
             });
         }, 250);
     });
