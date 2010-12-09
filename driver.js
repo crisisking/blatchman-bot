@@ -25,7 +25,7 @@ conn.on('write', function(message) {
 
 conn.on('ready', function() {
     conn.join('#blatchdev');
-
+    conn.join('#droog');
 });
 
 conn.on('PRIVMSG', function(message) {
