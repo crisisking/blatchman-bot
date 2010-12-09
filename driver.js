@@ -90,25 +90,34 @@ conn.on('PRIVMSG', function(message) {
     var sender = message.prefix.substring(0, message.prefix.search('!'));
 
     if(target === 'blatchman' && sender === 'Xenos') {
-        if(message.args[0] === ':!dump') {
-            for(i in db) {
-                console.log(i + ': ' + db[i]);
-            }
-        } else if(message.args[0] === ':!save') {
-            save_db();
-        } else if(message.args[0] === ':!join') {
-            conn.join(message.args[1]);
-        } else if(message.args[0] === ':!quit') {
-            conn.write('QUIT :' + (message.args[1] || "fart lol"));
-            setTimeout(on_exit, 1500);
-        } else if(message.args[0] === ':!speak') {
-            say_something('#blatchdev');
-            say_something('#droog');
-        } else if(message.args[0] === ':!replyrate') {
-            reply_rate = Number(message.args[1]);
-        } else if(message.args[0] === ':!topicrate') {
-            topic_rate = Number(message.args[1]);
+        switch(message.args[0]) {
+            case ':!dump':
+                for(var i in db) {
+                    console.log(i + ': ' + db[i]);
+                }
+                break;
+            case ':!save':
+                save_db();
+                break;
+            case ':!join':
+                conn.join(message.args[1]);
+                break;
+            case ':!quit':
+                conn.write('QUIT :' + (message.args[1] || "fart lol"));
+                setTimeout(on_exit, 1500);
+                break;
+            case ':!speak':
+                say_something('#blatchdev');
+                say_something('#droog');
+                break;
+            case ':!replyrate':
+                reply_rate = Number(message.args[1]);
+                break;
+            case ':!topicrate':
+                topic_rate = Number(message.args[1]);
+                break;
         }
+        
     }
 
     message.args.unshift(target);
