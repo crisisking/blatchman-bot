@@ -37,11 +37,14 @@ conn.on('PRIVMSG', function(message) {
         roll = 0,
         word = '',
         i = '';
-       
+    
+    if(message.raw.search('pavlovmedia') !== -1) {
+        return;
+    }
     
     if(target === '#blatchdev' || target === '#droog') {
         // learning routine
-        if(sender != 'bron' && message.args[0] !== '!blatch') {
+        if(message.args[0] !== '!blatch') {
             setTimeout(function() {
                 learn(message.args.slice(0));
             }, 1000);
