@@ -35,7 +35,7 @@ conn.on('PRIVMSG', function(message) {
         actual_contents = [],
         sender = message.prefix.substring(0, message.prefix.search('!')),
         roll = 0,
-        word = '',
+        words = '',
         i = '';
     
     if(message.raw.search('pavlovmedia') !== -1) {
@@ -52,22 +52,24 @@ conn.on('PRIVMSG', function(message) {
         
         // speaking routine
         if(message.args[0] === '!blatch') {
-            word = message.args[1];
+            words = message.args[1] + ' ' + message.args[2];
+            words = words.trim();
         } else {
             roll = Math.random();
         }
         
         if(roll <= reply_rate) {
-            if(!word) {
+            if(!words) {
                 roll = Math.random();
                 if(roll <= topic_rate) {
-                    word = message.args[Math.floor(Math.random() * message.args.length)];
+                    word_index = Math.floor(Math.random() * (message.args.length - 1));
+                    words = message.args[word_index] + ' ' + message.args[word_index+1];
                 }
                 
             }
             
             setTimeout(function() {
-                say_something(target, word);
+                say_something(target, words);
             }, 300);
             
         }
@@ -127,18 +129,19 @@ function on_exit() {
     process.exit();
 }
 
-function say_something(channel, seed_word) {
+function say_something(channel, seed_words) {
     var sentence = [];
     var keys = Object.keys(db);
-    if(!seed_word) {
-        seed_word = keys[Math.floor(Math.random() * keys.length)];
+    if(!seed_words) {
+        seed_words = keys[Math.floor(Math.random() * keys.length)];
     }
     
     while(sentence.join(' ').length < 500) {
-        sentence.push(seed_word);
-        var source = db[seed_word];
+        sentence.push(seed_words);
+        var source = db[seed_words];
         if(source) {
-            seed_word = source[Math.floor(Math.random() * source.length)];
+            new_word = source[Math.floor(Math.random() * source.length)];
+            seed_words = seed_words.split(' ')[1] + ' ' + new_word;
         } else {
             break;
         }
@@ -149,7 +152,7 @@ function say_something(channel, seed_word) {
 
 function learn(words) {
     var i = 0,
-        word = '',
+        words = '',
         contents = [];
     
     for(i; i < words.length; i += 1) {
@@ -159,7 +162,7 @@ function learn(words) {
         }
     }
     
-    if(contents.length == 2) {
+    if(contents.length === 2) {
         words = contents.join(' ');
         db[words] = db[words] || [];
         return;
