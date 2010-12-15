@@ -159,16 +159,16 @@ function learn(words) {
         }
     }
     
-    if(contents.length === 1) {
-        word = contents[0];
-        db[word] = db[word] || [];
+    if(contents.length == 2) {
+        words = contents.join(' ');
+        db[words] = db[words] || [];
         return;
     }
     
-    for(i=0; i < contents.length - 1; i += 1) {
-        word = contents[i];
-        db[word] = db[word] || [];
-        db[word].push(contents[i+1]);
+    for(i=0; i < contents.length - 2; i += 1) {
+        words = contents[i] + ' ' + contents[i+1];
+        db[words] = db[words] || [];
+        db[word].push(contents[i+2]);
     }
     
 }
