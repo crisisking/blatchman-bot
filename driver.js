@@ -1,7 +1,7 @@
 var irc = require('./irc/irc'),
     sys = require('sys'),
     fs = require('fs'),
-    filename = '/var/blatchman-logs.db',
+    filename = '/var/blatchman-logs2.db',
     reply_rate = 0.25,
     topic_rate = 0.55,
     bot_nick = 'blatchman',
@@ -36,8 +36,9 @@ conn.on('PRIVMSG', function(message) {
         sender = message.prefix.substring(0, message.prefix.search('!')),
         roll = 0,
         words = '',
-        i = '';
-    
+        i = '',
+        actual_message = message.args.slice(0);
+
     if(message.raw.search('pavlovmedia') !== -1) {
         return;
     }
@@ -46,14 +47,18 @@ conn.on('PRIVMSG', function(message) {
         // learning routine
         if(message.args[0] !== '!blatch') {
             setTimeout(function() {
-                learn(message.args.slice(0));
+                learn(actual_message);
             }, 1000);
         }
         
         // speaking routine
         if(message.args[0] === '!blatch') {
-            words = message.args[1] + ' ' + message.args[2];
-            words = words.trim();
+            if(message.args[1] && message.args[2]) {
+                words = message.args[1] + ' ' + message.args[2];
+                words = words.trim();
+            } else {
+                roll = Math.random();
+            }
         } else {
             roll = Math.random();
         }
@@ -151,27 +156,28 @@ function say_something(channel, seed_words) {
 }
 
 function learn(words) {
+    
     var i = 0,
-        words = '',
+        phrase = '',
         contents = [];
     
     for(i; i < words.length; i += 1) {
-        word = words[i].trim();
-        if(word) {
-            contents.push(word);
+        phrase = words[i].trim();
+        if(phrase) {
+            contents.push(phrase);
         }
     }
     
     if(contents.length === 2) {
-        words = contents.join(' ');
-        db[words] = db[words] || [];
+        phrase = contents.join(' ');
+        db[phrase] = db[phrase] || [];
         return;
     }
     
     for(i=0; i < contents.length - 2; i += 1) {
-        words = contents[i] + ' ' + contents[i+1];
-        db[words] = db[words] || [];
-        db[word].push(contents[i+2]);
+        phrase = contents[i] + ' ' + contents[i+1];
+        db[phrase] = db[phrase] || [];
+        db[phrase].push(contents[i+2]);
     }
     
 }
