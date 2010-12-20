@@ -112,6 +112,7 @@ conn.on('PRIVMSG', function(message) {
   
 });
 
+conn.on('close', on_exit);
 process.on('SIGINT', on_exit);
 process.on('SIGTERM', on_exit);
 
