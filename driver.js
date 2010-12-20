@@ -46,9 +46,7 @@ conn.on('PRIVMSG', function(message) {
     if(target === '#blatchdev' || target === '#droog') {
         // learning routine
         if(message.args[0] !== '!blatch') {
-            setTimeout(function() {
-                learn(actual_message);
-            }, 1000);
+            learn(actual_message);
         }
         
         // speaking routine
