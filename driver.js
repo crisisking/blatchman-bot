@@ -71,7 +71,8 @@ conn.on('PRIVMSG', function(message) {
                 roll = Math.random();
                 if(roll <= topic_rate && actual_message[0] !== '!blatch') {
                     word_index = Math.floor(Math.random() * (actual_message.length - 1));
-                    words = actual_message[word_index] + ' ' + actual_message[word_index+1];
+                    words = actual_message[word_index] + ' ' + (actual_message[word_index+1] || '');
+                    words = words.trim();
                 }
                 
             }
