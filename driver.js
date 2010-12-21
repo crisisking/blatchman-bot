@@ -5,7 +5,8 @@ var irc = require('./irc/irc'),
     reply_rate = 0.25,
     topic_rate = 0.55,
     bot_nick = 'blatchman',
-    owner_nick = 'Xenos';
+    owner_nick = 'Xenos',
+    word_lookup = {};
 
 try {
     var db = JSON.parse(fs.readFileSync(filename, 'utf8'));
@@ -13,6 +14,10 @@ try {
 
 catch(error) {
     var db = {};
+}
+
+finally {
+    word_lookup = build_lookup();
 }
 
 var conn = new irc.Connection('irc.synirc.net', 6667, bot_nick);
@@ -188,6 +193,18 @@ function learn(words) {
         db[phrase].push(contents[i+2]);
     }
     
+}
+
+function build_lookup() {
+    word_lookup = {};
+    for(var prefix in db) {
+        keys = prefix.split(' ');
+        for(var i = 0; i < keys.length; i += 1) {
+            key = keys[i];
+            word_lookup[key] = word_lookup[key] || [];
+            word_lookup[key].push(prefix);
+        }
+    }
 }
 
 setInterval(save_db, 300000);
