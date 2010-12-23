@@ -17,7 +17,7 @@ catch(error) {
 }
 
 finally {
-    word_lookup = build_lookup();
+    build_lookup();
 }
 
 var conn = new irc.Connection('irc.synirc.net', 6667, bot_nick);
@@ -79,8 +79,8 @@ conn.on('PRIVMSG', function(message) {
                 
             }
             
-            if(words.split(' ').length === 1) {
-                words = word_lookup[words][Math.random() * word_lookup[words].length] || words;
+            if(words.split(' ').length === 1 && words !== '') {
+                words = word_lookup[words][Math.floor(Math.random() * word_lookup[words].length)] || words;
             }
                         
             setTimeout(function() {
@@ -191,6 +191,14 @@ function learn(words) {
     if(contents.length === 2) {
         phrase = contents.join(' ');
         db[phrase] = db[phrase] || [];
+        for(i=0; i < 2; i += 1) {
+            word_lookup[contents[i]] = word_lookup[contents[i]] || [];
+            word_lookup[contents[i]].push(phrase);
+        }
+        return;
+
+    } else if(contents.length == 1) {
+        word_lookup[contents[0]] = word_lookup[contents[0]] || [];
         return;
     }
     
