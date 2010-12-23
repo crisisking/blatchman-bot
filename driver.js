@@ -44,7 +44,7 @@ conn.on('PRIVMSG', function(message) {
         i = '',
         actual_message = message.args.slice(0);
 
-    if(message.raw.search('pavlovmedia') !== -1) {
+    if(message.raw.search('pavlovmedia') !== -1 || message.raw.search('~bron') !== -1) {
         return;
     }
     
@@ -197,7 +197,7 @@ function learn(words) {
         }
         return;
 
-    } else if(contents.length == 1) {
+    } else if(contents.length === 1) {
         word_lookup[contents[0]] = word_lookup[contents[0]] || [];
         return;
     }
