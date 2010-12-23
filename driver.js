@@ -52,8 +52,10 @@ conn.on('PRIVMSG', function(message) {
         // learning routine
         if(message.args[0] !== '!blatch') {
             learn(actual_message);
+        } else {
+            learn(actual_message.slice(1));
         }
-        
+
         // speaking routine
         if(actual_message[0] === '!blatch') {
             
