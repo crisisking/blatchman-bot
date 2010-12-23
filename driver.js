@@ -56,12 +56,14 @@ conn.on('PRIVMSG', function(message) {
         
         // speaking routine
         if(actual_message[0] === '!blatch') {
-            if(actual_message[1] && actual_message[2]) {
-                words = actual_message[1] + ' ' + actual_message[2];
-                words = words.trim();
-            } else {
+            
+            if(actual_message.join(' ').trim(' ').split(' ').length === 1) {
                 roll = 0;
+            } else {
+                words = actual_message[1] + ' ' + (actual_message[2] || '');
+                words = words.trim();
             }
+
         } else {
             roll = Math.random();
         }
@@ -77,6 +79,10 @@ conn.on('PRIVMSG', function(message) {
                 
             }
             
+            if(words.split(' ').length === 1) {
+                words = word_lookup[words][Math.random() * word_lookup[words].length] || words;
+            }
+                        
             setTimeout(function() {
                 say_something(target, words);
             }, 300);
