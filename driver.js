@@ -136,8 +136,10 @@ process.on('uncaughtException', function(err) {
 });
 
 function save_db() {
+    var tmp_db = filename + '.tmp';
     console.log('Saving DB...');
-    fs.writeFileSync(filename, JSON.stringify(db), 'utf8');
+    fs.writeFileSync(tmp_db, JSON.stringify(db), 'utf8');
+    fs.renameSync(tmp_db, filename);
     console.log('DB saved.');
 }
 
